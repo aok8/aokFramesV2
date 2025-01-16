@@ -21,7 +21,7 @@
 <nav class="fixed top-0 right-0 z-40 p-4">
   <button 
     class="relative z-50 w-10 h-10 focus:outline-none"
-    on:click={toggleMenu}
+    onclick={toggleMenu}
     aria-label="Toggle menu"
   >
     <div class="flex flex-col justify-center h-full space-y-2">
@@ -59,7 +59,7 @@
               class="text-white text-3xl font-light hover:text-gray-300"
               target={external ? '_blank' : undefined}
               rel={external ? 'noopener noreferrer' : undefined}
-              on:click={() => !external && (isMenuOpen = false)}
+              onclick={() => !external && (isMenuOpen = false)}
             >
               {label}
             </a>

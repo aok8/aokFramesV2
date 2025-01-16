@@ -7,22 +7,37 @@
   let innerHeight = $state(0);
   let coverTransform = $state(0);
   let mainTextOpacity = $state(0);
-  let overlayOpacity = $state(0.4); // Initial overlay opacity
+  let overlayOpacity = $state(0.4);
+  let textAnimationStarted = $state(false);
+  let textAnimationComplete = $state(false);
 
   // Update transform based on scroll position
   $effect(() => {
     if (scrollY === undefined || innerHeight === undefined) return;
     
-    // First phase (0-100%): Slide out cover and fade in text
-    const firstPhaseProgress = Math.min(scrollY / (innerHeight * 1.5), 1);
-    coverTransform = firstPhaseProgress * 100;
-    mainTextOpacity = firstPhaseProgress;
+    // Calculate cover slide progress (0-100%)
+    const slideProgress = Math.min(scrollY / innerHeight, 1);
+    coverTransform = slideProgress * 100;
 
-    // Second phase: Fade out text and overlay (starts after first phase)
-    if (scrollY > innerHeight * 1.5) {
-      const secondPhaseProgress = Math.min((scrollY - innerHeight * 1.5) / (innerHeight * 1.5), 1);
-      mainTextOpacity = 1 - secondPhaseProgress;
-      overlayOpacity = 0.4 * (1 - secondPhaseProgress);
+    // Reset text animation if cover comes back
+    if (slideProgress < 0.95) {
+      textAnimationStarted = false;
+      textAnimationComplete = false;
+      mainTextOpacity = 0;
+    }
+
+    // Start text animation when cover is almost fully removed
+    if (slideProgress >= 0.95 && !textAnimationStarted) {
+      textAnimationStarted = true;
+      // Fade in text
+      setTimeout(() => {
+        mainTextOpacity = 1;
+        // Fade out text after a delay
+        setTimeout(() => {
+          mainTextOpacity = 0;
+          textAnimationComplete = true;
+        }, 1500);
+      }, 200);
     }
   });
 </script>
@@ -33,7 +48,7 @@
 <Navigation />
 
 <!-- Scrollable container for triggering the animation -->
-<div class="h-[400vh]">
+<div class="h-[200vh]">
   <!-- Fixed content container -->
   <div class="fixed inset-0 overflow-hidden">
     <!-- Background image (stays in place) -->
@@ -62,7 +77,7 @@
     <!-- Main content - always centered -->
     <main class="relative flex items-center justify-center h-full text-white z-10">
       <h1 
-        class="text-5xl md:text-7xl font-light tracking-wider transition-opacity duration-500"
+        class="text-5xl md:text-7xl font-light tracking-wider transition-all duration-1000"
         style="opacity: {mainTextOpacity}"
       >
         growth through experience
