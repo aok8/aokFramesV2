@@ -3,15 +3,27 @@
   import { fade, fly } from 'svelte/transition';
   import Navigation from '$lib/components/Navigation.svelte';
 
-  let scrollY: number = 0;
-  let innerHeight: number = 0;
+  let scrollY = $state(0);
+  let innerHeight = $state(0);
   let coverTransform = $state(0);
+  let mainTextOpacity = $state(0);
+  let overlayOpacity = $state(0.4); // Initial overlay opacity
 
   // Update transform based on scroll position
   $effect(() => {
-    if (typeof scrollY === 'undefined' || typeof innerHeight === 'undefined') return;
-    const progress = Math.min(scrollY / innerHeight, 1);
-    coverTransform = progress * 100;
+    if (scrollY === undefined || innerHeight === undefined) return;
+    
+    // First phase (0-100%): Slide out cover and fade in text
+    const firstPhaseProgress = Math.min(scrollY / (innerHeight * 1.5), 1);
+    coverTransform = firstPhaseProgress * 100;
+    mainTextOpacity = firstPhaseProgress;
+
+    // Second phase: Fade out text and overlay (starts after first phase)
+    if (scrollY > innerHeight * 1.5) {
+      const secondPhaseProgress = Math.min((scrollY - innerHeight * 1.5) / (innerHeight * 1.5), 1);
+      mainTextOpacity = 1 - secondPhaseProgress;
+      overlayOpacity = 0.4 * (1 - secondPhaseProgress);
+    }
   });
 </script>
 
@@ -20,33 +32,38 @@
 <!-- Navigation should be outside both layers to always be accessible -->
 <Navigation />
 
-<!-- Cover page -->
-<div 
-  class="fixed inset-0 bg-[#2D4739] z-20 flex items-center justify-center pointer-events-none"
-  style="transform: translateX(-{coverTransform}%); transition: transform 0.5s ease-out"
->
-  <h1 class="text-6xl md:text-8xl text-white font-light tracking-wider">
-    AOKFrames
-  </h1>
-</div>
-
 <!-- Scrollable container for triggering the animation -->
-<div class="h-[200vh]">
+<div class="h-[400vh]">
   <!-- Fixed content container -->
   <div class="fixed inset-0 overflow-hidden">
-    <!-- Background with slide effect -->
+    <!-- Background image (stays in place) -->
     <div 
       class="absolute inset-0 bg-cover bg-center bg-no-repeat"
-      style="transform: translateX(-{coverTransform}%); transition: transform 0.5s ease-out; background-image: url('/images/bg.jpg');"
+      style="background-image: url('/images/bg.jpg');"
     >
-      <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+      <div 
+        class="absolute inset-0 bg-black transition-opacity duration-500"
+        style="opacity: {overlayOpacity}"
+      ></div>
+    </div>
+
+    <!-- Sliding green background -->
+    <div 
+      class="absolute inset-0 bg-[#2D4739] z-20 pointer-events-none"
+      style="transform: translateX(-{coverTransform}%); transition: transform 0.5s ease-out"
+    >
+      <div class="h-full flex items-center justify-center">
+        <h1 class="text-6xl md:text-8xl text-white font-light tracking-wider">
+          AOKFrames
+        </h1>
+      </div>
     </div>
 
     <!-- Main content - always centered -->
-    <main class="relative flex items-center justify-center h-full text-white">
+    <main class="relative flex items-center justify-center h-full text-white z-10">
       <h1 
-        class="text-5xl md:text-7xl font-light tracking-wider"
-        style="opacity: {coverTransform / 100}; transition: opacity 0.5s ease-out"
+        class="text-5xl md:text-7xl font-light tracking-wider transition-opacity duration-500"
+        style="opacity: {mainTextOpacity}"
       >
         growth through experience
       </h1>
