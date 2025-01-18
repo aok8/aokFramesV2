@@ -60,7 +60,7 @@
 
     // Handle about text opacity based on scroll position after animation
     if (textAnimationComplete && scrollY > innerHeight * 2) {
-      const aboutScrollProgress = (scrollY - innerHeight * 2) / (innerHeight * 0.5);
+      const aboutScrollProgress = (scrollY - innerHeight * 2) / (innerHeight * 0.3);
       aboutTextOpacity = Math.min(aboutScrollProgress, 1);
     }
   });
@@ -78,7 +78,7 @@
 <Navigation />
 
 <!-- Scrollable container -->
-<div class="min-h-[300vh]">
+<div class="min-h-[400vh]">
   <!-- First section with background image -->
   <div class="fixed inset-0 overflow-hidden">
     <!-- Background image -->

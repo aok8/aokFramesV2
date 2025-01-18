@@ -17,8 +17,7 @@
 
   onMount(async () => {
     try {
-      // In a real app, this would be an API call to fetch blog posts
-      // For now, we'll simulate loading time
+      // simulate loading time
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Example data

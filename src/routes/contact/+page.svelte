@@ -16,7 +16,7 @@
     error = '';
 
     try {
-      // In a real app, this would be an API call to send the email
+      // In a real app, fake email send, still need to implement
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Simulate success
